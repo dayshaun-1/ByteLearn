@@ -46,7 +46,7 @@ const MyCourses = () => {
               <th className="py-3 px-4">Earnings</th>
               <th className="py-3 px-4">Students</th>
               <th className="py-3 px-4">Published On</th>
-              <th className="py-3 px-4">Actions</th> {/* New column for actions */}
+              <th className="py-3 px-4">Actions</th>
             </tr>
           </thead>
           <tbody className="text-sm text-gray-700">

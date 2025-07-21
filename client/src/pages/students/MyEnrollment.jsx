@@ -24,7 +24,7 @@ const MyEnrollment = () => {
           const { data } = await axios.get(`${backend_url}/api/course/get-course-progress/${course._id}`, { headers: { token } });
 
           let totalLectures = 0;
-          const validLectureIds = new Set();
+          let validLectureIds = new Set();
           course.courseContent.forEach(chapter => {
             chapter.chapterContent.forEach(lecture => {
               validLectureIds.add(lecture.lectureId);

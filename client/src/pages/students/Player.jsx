@@ -94,12 +94,6 @@ const Player = () => {
     }
   }
 
-  useEffect(() => {
-    getCourseProgress();
-
-    console.log(progressData)
-  }, [])
-
   return courseData ? (
     <>
       <div className="min-h-screen px-4 md:px-10 py-8 bg-gray-50 flex flex-col lg:flex-row gap-8">
