@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../context/AddContext'
-import uniqid from 'uniqid';
+import { nanoid } from 'nanoid';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import toast from 'react-hot-toast';
@@ -83,7 +83,7 @@ const UpdateCourse = () => { // courseId prop to fetch specific course
       const title = prompt('Enter Chapter Name:');
       if (title) {
         const newChapter = {
-          chapterId: uniqid(),
+          chapterId: nanoid(10),
           chapterTitle: title,
           chapterContent: [],
           collapsed: false,
@@ -163,7 +163,7 @@ const UpdateCourse = () => { // courseId prop to fetch specific course
                 chapter.chapterContent.length > 0
                   ? Math.max(...chapter.chapterContent.map(l => l.lectureOrder)) + 1
                   : 1,
-              lectureId: uniqid(),
+              lectureId: nanoid(10),
             };
             return { ...chapter, chapterContent: [...chapter.chapterContent, newLecture] };
           }
