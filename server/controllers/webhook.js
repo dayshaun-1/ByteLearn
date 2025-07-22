@@ -31,10 +31,10 @@ export const stripeWebHooks = async (request, response) => {
 
             const purchaseData = await Purchase.findById(purchaseId);
             const userData = await User.findById(purchaseData.userId);
-            const courseData = await Course.findById(purchaseData.courseId.toString());
+            const courseData = await Course.findById(purchaseData.courseId);
 
-            userData.enrolledCourses.push(courseId);
-            courseData.enrolledStudents.push(userId);
+            userData.enrolledCourses.push(purchaseData.courseId);
+            courseData.enrolledStudents.push(purchaseData.userId);
 
             await userData.save();
             await courseData.save();
