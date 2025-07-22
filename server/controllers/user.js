@@ -222,8 +222,6 @@ export const purchaseCourse = async (req, res) => {
       amount: (courseData.coursePrice * (1 - 0.01 * courseData.discount)).toFixed(2),
     }
 
-    console.log(purchaseData);
-
     const newPurchase = await Purchase.create(purchaseData);
 
     // Stripe Gateway Initialize
