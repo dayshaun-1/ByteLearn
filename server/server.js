@@ -18,6 +18,10 @@ await connectCloudinary();
 
 // Middlewares
 app.use(cors())
+
+// Stripe webhook MUST be before express.json()
+app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebHooks);
+
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.json())
 
@@ -28,7 +32,6 @@ app.get('/', (req, res)=>{
 app.use('/api/user', userRouter);
 app.use('/api/course', courseRouter);
 app.use('/api/educator', authentication, protectEducator, educatorRouter);
-app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebHooks);
 
 app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
 

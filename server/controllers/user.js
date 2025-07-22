@@ -204,11 +204,11 @@ export const purchaseCourse = async (req, res) => {
 
     const userData = await User.findById(userId);
     if (!userData) {
-      return res.json({success: false, message: "User not found"});
+      return res.json({ success: false, message: "User not found" });
     }
     const courseData = await Course.findById(courseId);
     if (!courseData) {
-      return res.json({success: false, message: "Course not found"});
+      return res.json({ success: false, message: "Course not found" });
     }
 
     // Check if already enrolled
@@ -219,7 +219,7 @@ export const purchaseCourse = async (req, res) => {
     const purchaseData = {
       courseId: courseData._id,
       userId,
-      amount: (courseData.coursePrice * (1 - 0.01 * courseData.discount)).toFixed(2),
+      amount: Number((courseData.coursePrice * (1 - 0.01 * courseData.discount)).toFixed(2)),
     }
 
     const newPurchase = await Purchase.create(purchaseData);
@@ -234,23 +234,25 @@ export const purchaseCourse = async (req, res) => {
         product_data: {
           name: courseData.courseTitle
         },
-        unit_amount: Math.floor(newPurchase.amount) * 100
+        unit_amount: Math.floor(newPurchase.amount * 100)
       },
       quantity: 1
     }]
 
     const session = await stripeInstance.checkout.sessions.create({
-      success_url: `${origin}/loading/my-enrollments`,
+      success_url: `${origin}`,
       cancel_url: `${origin}`,
       line_items: line_items,
       mode: 'payment',
-      metadata: {
-        purchaseId: newPurchase._id.toString()
+      payment_intent_data: {
+        metadata: {
+          purchaseId: newPurchase._id.toString()
+        }
       }
     })
 
-    res.json({success: true, session_url: session.url})
+    res.json({ success: true, session_url: session.url })
   } catch (error) {
-    return res.json({success: false, message: error.message});
+    return res.json({ success: false, message: error.message });
   }
 }
