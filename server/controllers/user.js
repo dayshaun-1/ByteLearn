@@ -130,122 +130,127 @@ export const userEnrolledCourses = async (req, res) => {
   }
 };
 
-export const purchaseCourse = async (req, res) => {
-  try {
-    const { courseId } = req.body;
-    const { userId } = req.user;
-
-    // 1. Validate user
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    // 2. Validate course
-    const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({ success: false, message: "Course not found" });
-    }
-
-    // 3. Check if already enrolled
-    if (user.enrolledCourses.includes(courseId)) {
-      return res.status(400).json({ success: false, message: "Already enrolled in this course." });
-    }
-
-    // 4. Calculate discounted price (rounded to 2 decimals)
-    const discount = course.discount || 0;
-    const originalPrice = course.coursePrice;
-    const discountedAmount = Number((originalPrice * (1 - discount / 100)).toFixed(2));
-
-    // 5. Create Purchase
-    const purchase = await Purchase.create({
-      courseId,
-      userId,
-      amount: discountedAmount,
-      status: 'pending',
-    });
-
-    // 6. Simulate payment outcome
-    const paymentSuccess = Math.random() < 0.7;
-
-    if (paymentSuccess) {
-      // Update enrollment
-      user.enrolledCourses.push(courseId);
-      course.enrolledStudents.push(userId);
-
-      // Save updates
-      await user.save();
-      await course.save();
-
-      // Update purchase status
-      purchase.status = 'completed';
-      await purchase.save();
-
-      return res.status(200).json({ success: true, message: "Payment successful" });
-    } else {
-      // Mark payment as failed (optional: store failure reason)
-      purchase.status = 'failed';
-      await purchase.save();
-
-      return res.status(400).json({ success: false, message: "Payment failed" });
-    }
-
-  } catch (error) {
-    console.error("Purchase error:", error);
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 // export const purchaseCourse = async (req, res) => {
 //   try {
 //     const { courseId } = req.body;
-//     const { origin } = req.headers;
 //     const { userId } = req.user;
 
-//     const userData = await User.findById(userId);
-//     if (!userData) {
-//       return res.json({success: false, message: "User not found"});
-//     }
-//     const courseData = await Course.findById(courseId);
-//     if (!courseData) {
-//       return res.json({success: false, message: "Course not found"});
+//     // 1. Validate user
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: "User not found" });
 //     }
 
-//     const purchaseData = {
-//       courseId: courseData._id,
+//     // 2. Validate course
+//     const course = await Course.findById(courseId);
+//     if (!course) {
+//       return res.status(404).json({ success: false, message: "Course not found" });
+//     }
+
+//     // 3. Check if already enrolled
+//     if (user.enrolledCourses.includes(courseId)) {
+//       return res.status(400).json({ success: false, message: "Already enrolled in this course." });
+//     }
+
+//     // 4. Calculate discounted price (rounded to 2 decimals)
+//     const discount = course.discount || 0;
+//     const originalPrice = course.coursePrice;
+//     const discountedAmount = Number((originalPrice * (1 - discount / 100)).toFixed(2));
+
+//     // 5. Create Purchase
+//     const purchase = await Purchase.create({
+//       courseId,
 //       userId,
-//       amount: (courseData.price * (1 - 0.01 * courseData.discount)).toFixed(2),
+//       amount: discountedAmount,
+//       status: 'pending',
+//     });
+
+//     // 6. Simulate payment outcome
+//     const paymentSuccess = Math.random() < 0.7;
+
+//     if (paymentSuccess) {
+//       // Update enrollment
+//       user.enrolledCourses.push(courseId);
+//       course.enrolledStudents.push(userId);
+
+//       // Save updates
+//       await user.save();
+//       await course.save();
+
+//       // Update purchase status
+//       purchase.status = 'completed';
+//       await purchase.save();
+
+//       return res.status(200).json({ success: true, message: "Payment successful" });
+//     } else {
+//       // Mark payment as failed (optional: store failure reason)
+//       purchase.status = 'failed';
+//       await purchase.save();
+
+//       return res.status(400).json({ success: false, message: "Payment failed" });
 //     }
 
-//     const newPurchase = await Purchase.create(purchaseData);
-
-//     // Stripe Gateway Initialize
-//     const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
-//     const currency = process.env.CURRENCY.toLowerCase();
-
-//     const line_items = [{
-//       price_data: {
-//         currency,
-//         product_data: {
-//           name: courseData.courseTitle
-//         },
-//         unit_amount: Math.floor(newPurchase.amount) * 100
-//       },
-//       quantity: 1
-//     }]
-
-//     const session = await stripeInstance.checkout.sessions.create({
-//       success_url: `${origin}/loading/my-enrollments`,
-//       cancel_url: `${origin}`,
-//       line_items: line_items,
-//       mode: 'payment',
-//       metadata: {
-//         purchaseId: newPurchase._id.toString()
-//       }
-//     })
-
-//     res.json({success: true, session_url: session.url})
 //   } catch (error) {
-//     return res.json({success: false, message: error.message});
+//     console.error("Purchase error:", error);
+//     return res.status(500).json({ success: false, message: error.message });
 //   }
-// }
+// };
+
+export const purchaseCourse = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+    const { origin } = req.headers;
+    const { userId } = req.user;
+
+    const userData = await User.findById(userId);
+    if (!userData) {
+      return res.json({success: false, message: "User not found"});
+    }
+    const courseData = await Course.findById(courseId);
+    if (!courseData) {
+      return res.json({success: false, message: "Course not found"});
+    }
+
+    // Check if already enrolled
+    if (userData.enrolledCourses.includes(courseId)) {
+      return res.json({ success: false, message: "Already enrolled in this course." });
+    }
+
+    const purchaseData = {
+      courseId: courseData._id,
+      userId,
+      amount: (courseData.price * (1 - 0.01 * courseData.discount)).toFixed(2),
+    }
+
+    const newPurchase = await Purchase.create(purchaseData);
+
+    // Stripe Gateway Initialize
+    const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const currency = process.env.CURRENCY.toLowerCase();
+
+    const line_items = [{
+      price_data: {
+        currency,
+        product_data: {
+          name: courseData.courseTitle
+        },
+        unit_amount: Math.floor(newPurchase.amount) * 100
+      },
+      quantity: 1
+    }]
+
+    const session = await stripeInstance.checkout.sessions.create({
+      success_url: `${origin}/loading/my-enrollments`,
+      cancel_url: `${origin}`,
+      line_items: line_items,
+      mode: 'payment',
+      metadata: {
+        purchaseId: newPurchase._id.toString()
+      }
+    })
+
+    res.json({success: true, session_url: session.url})
+  } catch (error) {
+    return res.json({success: false, message: error.message});
+  }
+}

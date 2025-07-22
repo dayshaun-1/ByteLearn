@@ -57,8 +57,8 @@ const CourseDetail = () => {
       }, {headers: {token}});
 
       if (response.data.success) {
-        toast.success(response.data.message);
-        setIsEnrolled(true);
+        const { session_url } = response.data;
+        window.location.replace(session_url);
       }
       else {
         toast.error(response.data.message);

@@ -8,6 +8,7 @@ import connectCloudinary from './configs/cloudinary.js';
 import educatorRouter from './routes/educator.js';
 import protectEducator from './middlewares/protectEducator.js';
 import courseRouter from './routes/course.js';
+import { stripeWebHooks } from './controllers/webhook.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -27,6 +28,7 @@ app.get('/', (req, res)=>{
 app.use('/api/user', userRouter);
 app.use('/api/course', courseRouter);
 app.use('/api/educator', authentication, protectEducator, educatorRouter);
+app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebHooks);
 
 app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
 
