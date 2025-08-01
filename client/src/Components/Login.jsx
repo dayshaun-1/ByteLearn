@@ -35,6 +35,7 @@ const Login = () => {
       setToken(response.data.token);
       setIsEducator(response.data.isEducator);
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('isEducator', response.data.isEducator);
       setShowLogin(false);
     } else {
       alert(response.data.message);

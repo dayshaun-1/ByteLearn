@@ -21,11 +21,14 @@ export const AppContextProvider = (props) => {
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [userData, setUserData] = useState(null);
 
-    // useEffect(()=>{
-    //     if (!token && localStorage.getItem('token')) {
-    //         setToken(localStorage.getItem('token'));
-    //     }
-    // }, [token])
+    useEffect(()=>{
+        if (!token && localStorage.getItem('token')) {
+            setToken(localStorage.getItem('token'));
+            if (localStorage.getItem('isEducator')) {
+                setIsEducator(localStorage.getItem('isEducator'));
+            }
+        }
+    }, [token])
 
     // Fetch User Enrolled Courses
     const fetchUserEnrolledCourses = async () => {

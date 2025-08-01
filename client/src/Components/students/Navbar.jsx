@@ -22,6 +22,7 @@ const Navbar = () => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('isEducator');
     setToken('');
     setIsEducator(false);
     navigate('/');
